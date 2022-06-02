@@ -27,6 +27,7 @@ class _ProductCardState extends State<ProductCard> {
       child: InkWell(
         onTap: () {
           _routerProvider.currentPage = "product";
+          _routerProvider.notifyMyListener();
         },
         child: Container(
           width: width, height: height,

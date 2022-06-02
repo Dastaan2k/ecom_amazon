@@ -4,6 +4,7 @@ import 'package:ecom_amazon/scenes/category_page.dart';
 import 'package:ecom_amazon/scenes/deals_page.dart';
 import 'package:ecom_amazon/scenes/home_page.dart';
 import 'package:ecom_amazon/scenes/login_page.dart';
+import 'package:ecom_amazon/scenes/product_description_page.dart';
 import 'package:ecom_amazon/scenes/wishlist_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ class AppRoute {
   AppRoute.deals() : url = "deals";
   AppRoute.error() : url = "error";
   AppRoute.login() : url = "login";
+  AppRoute.product() : url = "product";
 
 }
 
@@ -32,8 +34,6 @@ class AppRouteInformationParser extends RouteInformationParser<AppRoute> {
   Future<AppRoute> parseRouteInformation(RouteInformation routeInformation) {
 
     Uri uri = Uri.parse(routeInformation.location!);
-
-    print("Parsing route information : ${routeInformation.location}");
 
     if(uri.pathSegments.isEmpty) {
       return Future.value(AppRoute.home());
@@ -51,18 +51,17 @@ class AppRouteInformationParser extends RouteInformationParser<AppRoute> {
       else if(uri.pathSegments[0] == "deals"){
         return Future.value(AppRoute.deals());
       }
+      else if(uri.pathSegments[0] == "product") {
+        return Future.value(AppRoute.product());
+      }
     }
     return Future.value(AppRoute.error());
 
   }
 
   @override
-  RouteInformation? restoreRouteInformation(AppRoute route) {
-
-    print("Restoring route information : ${route.url}");
-
-    return RouteInformation(location: route.url);
-
+  RouteInformation? restoreRouteInformation(AppRoute configuration) {
+    return RouteInformation(location: configuration.url);
   }
 
 }
@@ -84,7 +83,7 @@ class PrimaryAppRouterDelegate extends RouterDelegate<AppRoute> with ChangeNotif
 
     return Navigator(
       pages: [
-        MaterialPage(child: Wrapper(),key: ValueKey("home")),
+        MaterialPage(child: Wrapper(),key: const ValueKey("home")),
       ],
       onPopPage: (route,result) {
 
@@ -130,18 +129,17 @@ class SecondaryAppRouterDelegate extends RouterDelegate<AppRoute> with ChangeNot
   @override
   Widget build(BuildContext context) {
 
-    print("Secondary router delegate build : ${routerProvider.currentPage}");
-
     Uri uri = Uri.parse(routerProvider.currentPage);
 
     return Navigator(
       pages: [
-        MaterialPage(child: HomePage(),key: ValueKey("home")),
-        if(uri.pathSegments.length >= 1)
-          uri.pathSegments[0] == "category" ? MaterialPage(child: CategoryPage(),key: ValueKey("category")) :
-          uri.pathSegments[0] == "wishlist" ? MaterialPage(child: WishlistPage(),key: ValueKey("wishlist")) :
-          uri.pathSegments[0] == "cart" ? MaterialPage(child: CartPage(),key: ValueKey("cart")) :
-          uri.pathSegments[0] == "deals" ? MaterialPage(child: DealsPage(),key: ValueKey("deals")) : MaterialPage(child: Container(color: Colors.yellow,),key: ValueKey("Error")),
+        const MaterialPage(child: HomePage(),key: ValueKey("home")),
+        if(uri.pathSegments.isNotEmpty)
+          uri.pathSegments[0] == "category" ? const MaterialPage(child: CategoryPage(),key: ValueKey("category")) :
+          uri.pathSegments[0] == "wishlist" ? const MaterialPage(child: WishlistPage(),key: ValueKey("wishlist")) :
+          uri.pathSegments[0] == "cart" ? const MaterialPage(child: CartPage(),key: ValueKey("cart")) :
+          uri.pathSegments[0] == "deals" ? const MaterialPage(child: DealsPage(),key: ValueKey("deals")) :
+          uri.pathSegments[0] == "product" ? const MaterialPage(child: ProductDescriptionPage(), key: ValueKey("product")): MaterialPage(child: Container(color: Colors.yellow,),key: const ValueKey("Error")),
       ],
       onPopPage: (route,result) {
 
@@ -173,8 +171,6 @@ class SecondaryAppRouterDelegate extends RouterDelegate<AppRoute> with ChangeNot
   @override
   Future<void> setNewRoutePath(AppRoute configuration) async {
 
-    print("Setting new route path (Primary) : ${configuration.url}");
-
     routerProvider.currentPage = configuration.url;
     routerProvider.notifyMyListener();
 
@@ -183,8 +179,6 @@ class SecondaryAppRouterDelegate extends RouterDelegate<AppRoute> with ChangeNot
 
   @override
   get currentConfiguration {
-
-    print("Getting current configuration(Primary) : ${routerProvider.currentPage} ");
 
     if(routerProvider.currentPage == ""){
       return AppRoute.home();
@@ -201,6 +195,10 @@ class SecondaryAppRouterDelegate extends RouterDelegate<AppRoute> with ChangeNot
     else if(routerProvider.currentPage == "deals"){
       return AppRoute.deals();
     }
+    else if(routerProvider.currentPage == "product") {
+      return AppRoute.product();
+    }
+    return null;
   }
 
 
