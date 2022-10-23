@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
                           ); */
                   },child: Text("Login")),
                 TextField(controller: _textEditingController,),
-                RaisedButton(onPressed: (){
+                ElevatedButton(onPressed: (){
                   PhoneAuthCredential credential = PhoneAuthProvider.credential(verificationId: verificationID, smsCode: _textEditingController.text);
                   FirebaseAuth.instance.signInWithCredential(credential).then((value){
                     _routerProvider.isLoggedIn = true;
